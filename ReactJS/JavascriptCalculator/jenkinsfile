@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+    tools{
+        nodejs "nodejs"
+        
+    }
+    stages {
+        stage('install&Build') {
+            steps {
+                sh 'build.sh'
+            }
+        }
+		stage('Upload') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'awsdetails', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'madhavtest', excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: true, selectedRegion: 'us-east-2', showDirectlyInBrowser: false, sourceFile: 'build', storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: 's3bucketprofile', userMetadata: []   }
+		     
+
+    }
+    }
+}
+}
+
